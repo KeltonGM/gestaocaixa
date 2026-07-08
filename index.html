@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Caixa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Fluxo de Caixa Mensal</h1>
+        
+        <div class="dashboard">
+            <div class="card entrada">
+                <h3>Entradas</h3>
+                <p id="total-entradas">R$ 0,00</p>
+            </div>
+            <div class="card saida">
+                <h3>Saídas</h3>
+                <p id="total-saidas">R$ 0,00</p>
+            </div>
+            <div class="card saldo">
+                <h3>Lucro do Mês</h3>
+                <p id="total-saldo">R$ 0,00</p>
+            </div>
+        </div>
+
+        <form id="form-transacao">
+            <input type="text" id="descricao" placeholder="Descrição (Ex: Venda de produto)" required>
+            <input type="number" id="valor" step="0.01" placeholder="Valor (R$)" required>
+            <select id="tipo">
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+            </select>
+            <button type="submit">Adicionar</button>
+        </form>
+
+        <h2>Histórico do Mês</h2>
+        <ul id="lista-transacoes"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

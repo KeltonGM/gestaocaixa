@@ -1,0 +1,178 @@
+/* ==========================================================================
+   Configurações Globais e Cores
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+    --azul-escuro: #1e3a8a;    /* Azul para títulos e destaques principais */
+    --azul-medio: #3b82f6;     /* Azul para botões e links */
+    --azul-claro: #eff6ff;     /* Fundo bem suave para o site */
+    --entrada: #10b981;        /* Verde para transações de entrada */
+    --saida: #ef4444;          /* Vermelho para transações de saída */
+    --texto: #334155;          /* Cinza escuro para melhor leitura */
+    --branco: #ffffff;
+}
+
+body {
+    background-color: var(--azul-claro);
+    color: var(--texto);
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background-color: var(--branco);
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+    color: var(--azul-escuro);
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+h2 {
+    color: var(--azul-escuro);
+    margin: 25px 0 15px 0;
+    font-size: 18px;
+}
+
+/* ==========================================================================
+   Dashboard (Cards de Resumo)
+   ========================================================================== */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background-color: #f8fafc;
+    padding: 15px 10px;
+    border-radius: 8px;
+    text-align: center;
+    border-top: 4px solid #cbd5e1;
+}
+
+.card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.card p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Cores específicas dos Cards */
+.card.entrada { border-top-color: var(--entrada); color: var(--entrada); }
+.card.saida { border-top-color: var(--saida); color: var(--saida); }
+.card.saldo { border-top-color: var(--azul-medio); color: var(--azul-escuro); }
+
+/* ==========================================================================
+   Formulário de Cadastro
+   ========================================================================== */
+#form-transacao {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+#form-transacao input, 
+#form-transacao select {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+/* Detalhe em azul quando o usuário clica no campo */
+#form-transacao input:focus, 
+#form-transacao select:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+#form-transacao button {
+    background-color: var(--azul-medio);
+    color: var(--branco);
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#form-transacao button:hover {
+    background-color: var(--azul-escuro);
+}
+
+/* ==========================================================================
+   Lista de Histórico
+   ========================================================================== */
+#lista-transacoes {
+    list-style: none;
+    max-height: 250px;
+    overflow-y: auto; /* Adiciona barra de rolagem se a lista crescer muito */
+}
+
+#lista-transacoes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    font-size: 14px;
+    position: relative;
+    border-left: 5px solid #cbd5e1;
+}
+
+/* Detalhes coloridos na lateral esquerda de cada item */
+#lista-transacoes li.entrada { border-left-color: var(--entrada); }
+#lista-transacoes li.saida { border-left-color: var(--saida); }
+
+#lista-transacoes li span {
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+/* Botão de excluir (X) */
+#lista-transacoes button {
+    background-color: transparent;
+    color: #94a3b8;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+#lista-transacoes button:hover {
+    color: var(--saida);
+}
