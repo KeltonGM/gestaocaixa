@@ -3,337 +3,669 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Caixa Diária</title>
+    <title>Painel Fluxo de Caixa Pro</title>
     <style>
         /* ==========================================================================
-           Configurações Globais e Cores
+           Variáveis de Design Pro, Reset & Animações
            ========================================================================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
 
         :root {
-            --azul-escuro: #1e3a8a;    
-            --azul-medio: #3b82f6;     
-            --azul-claro: #eff6ff;     
+            --bg-principal: #0f172a;    
+            --bg-card: #1e293b;         
+            --bg-input: #0f172a;        
+            --border-color: #334155;    
+            --azul-pro: #3b82f6;        
+            --azul-hover: #2563eb;      
             --entrada: #10b981;        
-            --saida: #ef4444;          
-            --texto: #334155;          
+            --saida: #f43f5e;          
+            --texto-principal: #f8fafc; 
+            --texto-secundario: #94a3b8;
             --branco: #ffffff;
+            --transicao-suave: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            background-color: var(--azul-claro);
-            color: var(--texto);
-            padding: 40px 20px;
+            background-color: var(--bg-principal);
+            color: var(--texto-principal);
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
         }
 
-        .container {
-            background-color: var(--branco);
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* ==========================================================================
+           Tela de Login Sólida
+           ========================================================================== */
+        .box-login {
+            background-color: var(--bg-card);
             width: 100%;
-            max-width: 1000px; /* Layout expandido para melhor aproveitamento de tela */
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: var(--azul-escuro);
+            max-width: 420px;
+            padding: 45px 35px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 24px;
+            animation: fadeInScale 0.4s ease-out;
         }
 
-        h2 {
-            color: var(--azul-escuro);
-            margin: 25px 0 15px 0;
+        .box-login h2 { color: var(--branco); margin-bottom: 12px; font-size: 28px; font-weight: 700; }
+        .box-login p { color: var(--texto-secundario); font-size: 14px; margin-bottom: 30px; }
+
+        .form-grupo { display: flex; flex-direction: column; gap: 18px; margin-bottom: 25px; }
+        .form-grupo input {
+            background-color: var(--bg-input);
+            color: var(--texto-principal);
+            padding: 14px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: var(--transicao-suave);
+        }
+        .form-grupo input:focus { border-color: var(--azul-pro); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
+
+        .btn-login {
+            background-color: var(--azul-pro);
+            color: var(--branco);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transicao-suave);
+        }
+        .btn-login:hover { background-color: var(--azul-hover); transform: translateY(-1px); }
+
+        .alternar-conta { margin-top: 20px; font-size: 14px; color: var(--texto-secundario); }
+        .alternar-conta span { color: var(--azul-pro); cursor: pointer; font-weight: 600; }
+
+        /* ==========================================================================
+           Container Principal (Layout Clássico do PC)
+           ========================================================================== */
+        .container {
+            display: none; 
+            background-color: var(--bg-card);
+            width: 100vw;
+            height: 100vh;
+            padding: 40px;
+            position: relative;
+            overflow-y: auto;
+            animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #btn-deslogar {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--saida);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+            z-index: 10;
+        }
+        #btn-deslogar:hover {
+            background-color: var(--saida);
+            color: var(--branco);
+            transform: scale(1.08) rotate(90deg);
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
         }
 
-        /* Dashboard (Cards de Resumo) */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+        .navegacao-abas {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 30px;
+            padding-bottom: 2px;
+            transition: var(--transicao-suave);
+        }
+        .aba-link {
+            background: none;
+            border: none;
+            color: var(--texto-secundario);
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+            border-bottom: 3px solid transparent;
+        }
+        .aba-link:hover { color: var(--texto-principal); }
+        .aba-link.ativa { color: var(--azul-pro); border-bottom-color: var(--azul-pro); }
+
+        /* Páginas Internas com Efeito de Transição Fluida */
+        .pagina-sistema { 
+            display: none; 
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        .pagina-sistema.ativa { 
+            display: block; 
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .card {
-            background-color: #f8fafc;
-            padding: 15px 10px;
-            border-radius: 8px;
-            text-align: center;
-            border-top: 4px solid #cbd5e1;
+        h1 { color: var(--branco); margin-bottom: 30px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        h2 { color: var(--branco); margin: 30px 0 15px 0; font-size: 20px; font-weight: 700; }
+        
+        /* Dashboard em Cartões Clicáveis Dinâmicos */
+        .dashboard { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; 
+            margin-bottom: 30px; 
         }
-
-        .card h3 {
+        .card { 
+            background-color: rgba(15, 23, 42, 0.4); 
+            padding: 24px; 
+            border-radius: 14px; 
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--border-color); 
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::after {
+            content: 'Ver Detalhes →';
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
             font-size: 11px;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 5px;
+            color: var(--texto-secundario);
+            opacity: 0;
+            transform: translateX(-5px);
+            transition: var(--transicao-suave);
         }
-
-        .card p {
-            font-size: 22px; 
-            font-weight: bold;
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
+            background-color: rgba(15, 23, 42, 0.6);
         }
-
+        .card:hover::after { opacity: 1; transform: translateX(0); }
+        
+        .card h3 { font-size: 11px; text-transform: uppercase; color: var(--texto-secundario); margin-bottom: 8px; letter-spacing: 0.5px; }
+        .card p { font-size: 26px; font-weight: 800; }
         .card.entrada { border-top-color: var(--entrada); color: var(--entrada); }
         .card.saida { border-top-color: var(--saida); color: var(--saida); }
-        .card.saldo { border-top-color: var(--azul-medio); color: var(--azul-escuro); }
+        .card.saldo { border-top-color: var(--azul-pro); color: var(--branco); }
+        
+        /* Form e Listas */
+        #form-transacao { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr auto; 
+            gap: 14px; 
+            background-color: rgba(15, 23, 42, 0.2); 
+            padding: 24px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        #form-transacao input, #form-transacao select { 
+            background-color: var(--bg-input);
+            color: var(--texto-principal);
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            font-size: 14px; 
+            outline: none; 
+            transition: var(--transicao-suave);
+        }
+        #form-transacao input:focus, #form-transacao select:focus { border-color: var(--azul-pro); }
+        #form-transacao button { 
+            background-color: var(--azul-pro); 
+            color: var(--branco); 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: var(--transicao-suave);
+        }
+        #form-transacao button:hover { background-color: var(--azul-hover); }
+        
+        #lista-transacoes { list-style: none; margin-bottom: 30px; }
+        #lista-transacoes li { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px 20px; 
+            margin-bottom: 8px; 
+            border-radius: 8px; 
+            background-color: rgba(15, 23, 42, 0.3); 
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--border-color); 
+            animation: fadeInScale 0.3s ease-out;
+        }
+        #lista-transacoes li.entrada { border-left-color: var(--entrada); }
+        #lista-transacoes li.saida { border-left-color: var(--saida); }
+        
+        .hora-badge {
+            background-color: rgba(148, 163, 184, 0.15);
+            color: var(--texto-secundario);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            margin-right: 12px;
+        }
 
-        /* Área de Botões de Ação */
-        .acoes-dia {
-            display: flex;
-            justify-content: flex-end;
+        #lista-transacoes li .valor-wrapper { font-weight: 700; margin-left: auto; margin-right: 20px; }
+        
+        .acoes-item { display: flex; gap: 10px; align-items: center; }
+        .btn-acao-lista { background: none; border: none; cursor: pointer; font-size: 14px; transition: var(--transicao-suave); }
+        .btn-acao-lista.editar:hover { transform: scale(1.15); filter: brightness(1.2); }
+        .btn-acao-lista.remover { color: var(--texto-secundario); }
+        .btn-acao-lista.remover:hover { color: var(--saida); transform: scale(1.15); }
+        
+        .barra-filtros {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            background-color: rgba(15, 23, 42, 0.4);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
             margin-bottom: 15px;
         }
-
-        #btn-novo-dia {
-            background-color: var(--branco);
-            color: var(--azul-medio);
-            border: 2px solid var(--azul-medio);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        #btn-novo-dia:hover {
-            background-color: var(--azul-medio);
-            color: var(--branco);
-        }
-
-        /* Formulário de Lançamento */
-        #form-transacao {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background-color: #f8fafc;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        #form-transacao input, 
-        #form-transacao select {
+        .barra-filtros input, .barra-filtros select {
+            background-color: var(--bg-input);
+            color: var(--texto-principal);
+            border: 1px solid var(--border-color);
             padding: 10px;
-            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
         }
 
-        #form-transacao input:focus, 
-        #form-transacao select:focus {
-            border-color: var(--azul-medio);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        #historico-dias { max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .card-dia-salvo { 
+            background-color: rgba(15, 23, 42, 0.3); 
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--azul-pro); 
+            padding: 16px 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: var(--transicao-suave);
         }
-
-        #form-transacao button {
-            background-color: var(--azul-medio);
-            color: var(--branco);
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #form-transacao button:hover {
-            background-color: var(--azul-escuro);
-        }
-
-        /* Lista de Lançamentos de Hoje */
-        #lista-transacoes {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-
-        #lista-transacoes li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            background-color: #f8fafc;
-            font-size: 14px;
-            border-left: 5px solid #cbd5e1;
-        }
-
-        #lista-transacoes li.entrada { border-left-color: var(--entrada); }
-        #lista-transacoes li.saida { border-left-color: var(--saida); }
-
-        #lista-transacoes li span {
-            font-weight: bold;
-            margin-left: auto;
-            margin-right: 15px;
-        }
-
-        #lista-transacoes button {
-            background-color: transparent;
-            color: #94a3b8;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #lista-transacoes button:hover { color: var(--saida); }
-
-        /* Aba e Seção do Histórico Geral */
-        .secao-historico {
-            margin-top: 30px;
-            border-top: 2px dashed #e2e8f0;
-            padding-top: 20px;
-        }
-
-        #historico-dias {
-            max-height: 250px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Cards do histórico que funcionam como botões expansíveis */
-        .card-dia-salvo {
-            background-color: #f1f5f9;
-            border-left: 5px solid var(--azul-escuro);
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-
-        .card-dia-salvo:hover {
-            background-color: #e2e8f0;
-        }
-
-        .card-dia-salvo:active {
-            transform: scale(0.99);
-        }
-
-        .topo-dia-salvo {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            margin-bottom: 4px;
-            width: 100%;
-        }
-
-        .infos-topo-dia {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            width: 90%;
-        }
-
-        .saldo-salvo { font-weight: bold; color: var(--azul-escuro); }
-        .detalhes-dia-salvo small { color: #64748b; }
-
-        /* Botão da Lixeira no histórico */
-        .btn-apagar-dia {
-            background-color: transparent;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 4px 8px;
-            color: #94a3b8;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .card-dia-salvo:hover .btn-apagar-dia {
-            color: #64748b;
-        }
-
-        .btn-apagar-dia:hover {
-            background-color: #fee2e2 !important;
-            color: var(--saida) !important;
-        }
-
-        /* Lista interna com os detalhes antigos (começa oculta) */
-        .lista-detalhes-antigos {
-            list-style: none;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #cbd5e1;
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        /* Classe ativada via JavaScript para abrir a lista de detalhes */
-        .lista-detalhes-antigos.ativo {
-            display: flex;
-        }
-
-        .item-detalhe-antigo {
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            color: #475569;
-            padding: 3px 0;
-        }
+        .card-dia-salvo:hover { background-color: rgba(15, 23, 42, 0.45); }
+        .topo-dia-salvo { display: flex; justify-content: space-between; align-items: center; }
+        .infos-topo-dia { display: flex; gap: 20px; align-items: center; width: 85%; }
         
-        .item-detalhe-antigo.entrada { color: var(--entrada); }
-        .item-detalhe-antigo.saida { color: var(--saida); }
+        .btn-ver-mais-detalhes {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--azul-pro);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .btn-ver-mais-detalhes:hover {
+            background-color: var(--azul-pro);
+            color: var(--branco);
+            transform: translateY(-1px);
+        }
+
+        .btn-apagar-dia {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+        }
+        .btn-apagar-dia:hover { transform: scale(1.2); }
+
+        #btn-novo-dia {
+            background: none;
+            color: var(--azul-pro);
+            border: 2px solid var(--azul-pro);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            transition: var(--transicao-suave);
+        }
+        #btn-novo-dia:hover { background-color: var(--azul-pro); color: var(--branco); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+
+        .grid-analitico { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+        .box-grafico-premium { background-color: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 14px; padding: 25px; min-height: 320px; display: flex; flex-direction: column; align-items: center; }
+        .box-grafico-premium h3 { font-size: 14px; color: var(--texto-secundario); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .secao-grafico-diario-rapido {
+            background-color: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 25px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ==========================================================================
+           Telas de Detalhamento Avançado
+           ========================================================================== */
+        .btn-voltar {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--texto-principal);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: var(--transicao-suave);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-voltar:hover { background-color: rgba(255, 255, 255, 0.1); transform: translateX(-2px); }
+
+        .flex-detalhes { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; margin-top: 20px; }
+        .tabela-detalhada {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: rgba(15, 23, 42, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .tabela-detalhada th, .tabela-detalhada td { padding: 12px 16px; text-align: left; }
+        .tabela-detalhada th { background-color: rgba(15, 23, 42, 0.6); color: var(--texto-secundario); font-weight: 600; }
+        .tabela-detalhada tr { border-bottom: 1px solid var(--border-color); }
+        .tabela-detalhada tr:last-child { border: none; }
+
+        .exportar-detalhes-dia { display: flex; gap: 12px; margin-top: 20px; }
+        .btn-exp-pro {
+            background-color: var(--bg-input);
+            color: var(--texto-principal);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+        }
+        .btn-exp-pro:hover { background-color: var(--azul-pro); border-color: var(--azul-pro); }
+
+        /* ==========================================================================
+           Estrutura de Reordenação Inteligente para Celulares (Foco no Lançamento)
+           ========================================================================== */
+        @media(max-width: 950px) {
+            .container { padding: 20px; }
+            .dashboard, .grid-analitico, .barra-filtros, .flex-detalhes { grid-template-columns: 1fr; }
+            #form-transacao { grid-template-columns: 1fr; }
+            
+            /* No celular, transformamos a tela inicial em flexbox para mudar a ordem dos blocos */
+            #pagina-fluxo-caixa {
+                display: flex;
+                flex-direction: column;
+            }
+            #pagina-fluxo-caixa h1 { order: 1; }
+            /* O formulário vai direto para o topo, abaixo apenas do título principal! */
+            #form-transacao { 
+                order: 2; 
+                border: 2px solid var(--azul-pro); 
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+            }
+            #pagina-fluxo-caixa h2:nth-of-type(1) { order: 3; } /* Título "Resultados de Hoje" */
+            .dashboard { order: 4; }
+            #pagina-fluxo-caixa div:nth-of-type(1) { order: 5; } /* Div do botão fechar dia */
+            #pagina-fluxo-caixa h2:nth-of-type(2) { order: 6; } /* Título "Lançamentos de Hoje" */
+            #lista-transacoes { order: 7; }
+            .secao-grafico-diario-rapido { order: 8; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Fluxo de Caixa Diário</h1>
+
+    <div class="box-login" id="secao-autenticacao">
+        <h2 id="login-titulo">Acessar Sistema</h2>
+        <p id="login-subtitulo">Insira suas credenciais para sincronizar em tempo real</p>
         
-        <div class="dashboard">
-            <div class="card entrada">
-                <h3>Entradas</h3>
-                <p id="total-entradas">R$ 0,00</p>
+        <form id="form-login">
+            <div class="form-grupo">
+                <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                <input type="password" id="login-senha" placeholder="Sua senha (mín. 6 caracteres)" required>
             </div>
-            <div class="card saida">
-                <h3>Saídas</h3>
-                <p id="total-saidas">R$ 0,00</p>
-            </div>
-            <div class="card saldo">
-                <h3>Lucro do Dia</h3>
-                <p id="total-saldo">R$ 0,00</p>
-            </div>
-        </div>
-
-        <div class="acoes-dia">
-            <button id="btn-novo-dia">Novo dia</button>
-        </div>
-
-        <form id="form-transacao">
-            <input type="text" id="descricao" placeholder="Descrição (Ex: Venda)" required>
-            <input type="number" id="valor" step="0.01" placeholder="Valor (R$)" required>
-            
-            <select id="tipo" required>
-                <option value="" disabled selected>Selecione o tipo</option>
-                <option value="entrada">Entrada</option>
-                <option value="saida">Saída</option>
-            </select>
-            
-            <button type="submit">Adicionar Lançamento</button>
+            <button type="submit" class="btn-login" id="btn-submeter-auth">Entrar no Sistema</button>
         </form>
-
-        <h2>Lançamentos de Hoje</h2>
-        <ul id="lista-transacoes"></ul>
-
-        <div class="secao-historico">
-            <h2>Histórico de Dias Anteriores</h2>
-            <div id="historico-dias"></div>
+        
+        <div class="alternar-conta">
+            <p id="texto-alternar">Não tem uma conta? <span onclick="mudarModoAuth()">Cadastre-se</span></p>
         </div>
     </div>
 
+    <div class="container" id="sistema-caixa">
+        <button id="btn-deslogar" title="Sair do Sistema">🚪</button>
+
+        <div class="navegacao-abas" id="menu-navegacao-principal">
+            <button class="aba-link ativa" onclick="alternarPagina('fluxo-caixa', this)">Movimentações Diárias</button>
+            <button class="aba-link" onclick="alternarPagina('historico-caixas', this)">Histórico Geral</button>
+            <button class="aba-link" onclick="alternarPagina('graficos-analise', this)">Resumo do Mês</button>
+        </div>
+
+        <div id="pagina-fluxo-caixa" class="pagina-sistema ativa">
+            <h1>Painel de Controle Financeiro</h1>
+            
+            <h2>Resultados de Hoje</h2>
+            <div class="dashboard">
+                <div class="card entrada" onclick="irParaSubtela('detalhe-entradas')">
+                    <h3>Total Entradas (Hoje)</h3>
+                    <p id="total-entradas">R$ 0,00</p>
+                </div>
+                <div class="card saida" onclick="irParaSubtela('detalhe-saidas')">
+                    <h3>Total Saídas (Hoje)</h3>
+                    <p id="total-saidas">R$ 0,00</p>
+                </div>
+                <div class="card saldo" onclick="irParaSubtela('detalhe-lucro')">
+                    <h3>Lucro Líquido (Hoje)</h3>
+                    <p id="total-saldo">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <button id="btn-novo-dia">Fechar Caixa do Dia 🔒</button>
+            </div>
+
+            <form id="form-transacao">
+                <input type="text" id="descricao" placeholder="Descrição (Ex: Venda de Insumos)" required>
+                <input type="text" id="valor" placeholder="R$ 0,00" required>
+                <select id="tipo" required>
+                    <option value="" disabled selected>Tipo de Operação</option>
+                    <option value="entrada">Entrada (+)</option>
+                    <option value="saida">Saída (-)</option>
+                </select>
+                <button type="submit" id="btn-salvar-transacao">Lançar no Caixa</button>
+            </form>
+
+            <h2>Lançamentos de Hoje</h2>
+            <ul id="lista-transacoes"></ul>
+
+            <div class="secao-grafico-diario-rapido">
+                <h3>Monitoramento em Tempo Real (Hoje)</h3>
+                <div style="position: relative; height: 230px; width: 100%; max-width: 350px; margin-top: 15px;">
+                    <canvas id="graficoCaixa"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagina-historico-caixas" class="pagina-sistema">
+            <h1>Histórico de Arquivamentos Anteriores</h1>
+            <div class="barra-filtros">
+                <input type="text" id="filtro-busca" placeholder="🔍 Buscar por descrição nos históricos..." oninput="filtrarHistorico()">
+                <select id="filtro-resultado" onchange="filtrarHistorico()">
+                    <option value="todos">Todos os resultados</option>
+                    <option value="positivo">Apenas dias com Lucro (+)</option>
+                    <option value="negativo">Apenas dias com Prejuízo (-)</option>
+                </select>
+            </div>
+            <div id="historico-dias"></div>
+        </div>
+
+        <div id="pagina-detalhes-dia-historico" class="pagina-sistema">
+            <button class="btn-voltar" onclick="voltarParaHistorico()">← Voltar ao Histórico</button>
+            <h1 id="detalhe-historico-titulo">Relatório Completo do Dia</h1>
+            
+            <div class="flex-detalhes">
+                <div class="box-grafico-premium">
+                    <h3>Proporção Operacional (Entradas vs Saídas)</h3>
+                    <div style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="graficoDetalheHistorico"></canvas>
+                    </div>
+                    
+                    <div class="exportar-detalhes-dia">
+                        <button id="btn-exp-pdf-historico" class="btn-exp-pro pdf">Exportar PDF</button>
+                        <button id="btn-exp-excel-historico" class="btn-exp-pro excel">Exportar Excel</button>
+                        <button id="btn-exp-csv-historico" class="btn-exp-pro csv">Exportar CSV</button>
+                    </div>
+                </div>
+                <div>
+                    <h3>Detalhamento das Operações</h3>
+                    <table class="tabela-detalhada">
+                        <thead>
+                            <tr><th>Hora</th><th>Descrição</th><th>Tipo</th><th>Valor</th></tr>
+                        </thead>
+                        <tbody id="tabela-detalhe-historico-corpo"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagina-detalhe-entradas" class="pagina-sistema">
+            <button class="btn-voltar" onclick="voltarParaFluxo()">← Voltar ao Painel</button>
+            <h1 style="color: var(--entrada);">Análise Detalhada de Entradas</h1>
+            <div class="flex-detalhes">
+                <div class="box-grafico-premium">
+                    <h3>Maiores Clientes / Descrições de Entrada</h3>
+                    <div style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="graficoSubEntradas"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3>Lista de Recebimentos (Hoje)</h3>
+                    <table class="tabela-detalhada">
+                        <thead>
+                            <tr><th>Hora</th><th>Descrição</th><th>Valor</th></tr>
+                        </thead>
+                        <tbody id="tabela-corpo-entradas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagina-detalhe-saidas" class="pagina-sistema">
+            <button class="btn-voltar" onclick="voltarParaFluxo()">← Voltar ao Painel</button>
+            <h1 style="color: var(--saida);">Análise Detalhada de Saídas</h1>
+            <div class="flex-detalhes">
+                <div class="box-grafico-premium">
+                    <h3>Maiores Centros de Custo (Saídas)</h3>
+                    <div style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="graficoSubSaidas"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3>Lista de Pagamentos (Hoje)</h3>
+                    <table class="tabela-detalhada">
+                        <thead>
+                            <tr><th>Hora</th><th>Descrição</th><th>Valor</th></tr>
+                        </thead>
+                        <tbody id="tabela-corpo-saidas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagina-detalhe-lucro" class="pagina-sistema">
+            <button class="btn-voltar" onclick="voltarParaFluxo()">← Voltar ao Painel</button>
+            <h1>Margem e Desempenho Líquido</h1>
+            <div class="flex-detalhes">
+                <div class="box-grafico-premium">
+                    <h3>Proporção Operacional (Entradas vs Saídas)</h3>
+                    <div style="position: relative; height: 260px; width: 100%;">
+                        <canvas id="graficoSubLucro"></canvas>
+                    </div>
+                </div>
+                <div class="box-grafico-premium" style="justify-content: center; text-align: center;">
+                    <h3>Diagnóstico de Saúde Financeira</h3>
+                    <p id="diagnostico-lucro-texto" style="font-size: 16px; margin-top: 15px; color: var(--texto-secundario); font-weight: 500; line-height: 1.6;"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="pagina-graficos-analise" class="pagina-sistema">
+            <h1>Consolidado e Indicadores Mensais</h1>
+            
+            <div class="dashboard" style="margin-bottom: 25px;">
+                <div class="card entrada" style="cursor: default;">
+                    <h3>Entradas do Mês</h3>
+                    <p id="mes-total-entradas">R$ 0,00</p>
+                </div>
+                <div class="card saida" style="cursor: default;">
+                    <h3>Saídas do Mês</h3>
+                    <p id="mes-total-saidas">R$ 0,00</p>
+                </div>
+                <div class="card saldo" style="cursor: default;">
+                    <h3>Resultado Acumulado</h3>
+                    <p id="mes-total-saldo">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="grid-analitico">
+                <div class="box-grafico-premium">
+                    <h3>Proporção de Custos Mensais</h3>
+                    <div style="position: relative; height: 230px; width: 100%; max-width: 350px;">
+                        <canvas id="graficoMesPizza"></canvas>
+                    </div>
+                </div>
+                <div class="box-grafico-premium">
+                    <h3>Evolução dos Caixas Diários</h3>
+                    <div style="position: relative; height: 230px; width: 100%;">
+                        <canvas id="graficoHistoricoLinha"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <script src="script.js"></script>
 </body>
 </html>
